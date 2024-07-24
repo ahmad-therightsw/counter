@@ -11,3 +11,14 @@ class IncrementCounterUseCase {
     counterRepository.increment();
   }
 }
+
+@lazySingleton
+class DecrementCounterUseCase {
+  final CounterRepository counterRepository;
+
+  DecrementCounterUseCase({required this.counterRepository});
+
+  void call() async {
+    counterRepository.decrement();
+  }
+}

@@ -9,11 +9,16 @@ import 'counter_event.dart';
 class CounterBloc extends Bloc<CounterEvent, CounterState> {
   final getCounterUserCase = getIt<GetCounterUseCase>();
   final incrementCounterUseCase = getIt<IncrementCounterUseCase>();
+  final decrementCounterUseCase = getIt<DecrementCounterUseCase>();
 
   CounterBloc() : super(InitialCounterState(CounterEntity(value: 0))) {
     on<CounterEvent>((event, emit) async {
       if (event is IncrementCounter) {
         incrementCounterUseCase();
+        final counter = getCounterUserCase();
+        emit(LoadedCounterState(counter));
+      } else if (event is DecrementCounter) {
+        decrementCounterUseCase();
         final counter = getCounterUserCase();
         emit(LoadedCounterState(counter));
       }
