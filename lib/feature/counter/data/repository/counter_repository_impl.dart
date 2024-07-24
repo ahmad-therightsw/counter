@@ -1,19 +1,28 @@
+import 'package:counter_clean_architecture/feature/counter/data/datasource/local/counter_local_datasource.dart';
 import 'package:counter_clean_architecture/feature/counter/domain/entities/counter_entity.dart';
 import 'package:counter_clean_architecture/feature/counter/domain/repositories/counter_repository.dart';
+import 'package:injectable/injectable.dart';
 
-import '../data-source/local/local_data_source.dart';
-import '../models/counter.dart';
-
+@LazySingleton(as: CounterRepository)
 class CounterRepositoryImpl extends CounterRepository {
   ///counter data source
-  LocalDataSource localDataSource;
+  final CounterLocalDataSource localDataSource;
 
   CounterRepositoryImpl({required this.localDataSource});
 
   @override
-  Future<CounterEntity> getCounter() async {
-    final Counter currentCounter = await localDataSource.getCounter();
-
+  CounterEntity getCounter() {
+    final currentCounter = localDataSource.getCounter();
     return CounterEntity(value: currentCounter.value);
+  }
+
+  @override
+  void decrement() {
+    localDataSource.decrement();
+  }
+
+  @override
+  void increment() {
+    localDataSource.increment();
   }
 }

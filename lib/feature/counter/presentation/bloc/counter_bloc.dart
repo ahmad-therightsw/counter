@@ -1,31 +1,22 @@
 import 'package:counter_clean_architecture/feature/counter/domain/entities/counter_entity.dart';
-import 'package:counter_clean_architecture/feature/counter/domain/use-cases/increament_counter_use_case.dart';
+import 'package:counter_clean_architecture/feature/counter/domain/usecases/get_counter_use_case.dart';
+import 'package:counter_clean_architecture/feature/counter/domain/usecases/increament_counter_use_case.dart';
 import 'package:counter_clean_architecture/feature/counter/presentation/bloc/counter_state.dart';
+import 'package:counter_clean_architecture/utils/di/di.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../domain/use-cases/get_counter_use_case.dart';
 import 'counter_event.dart';
 
 class CounterBloc extends Bloc<CounterEvent, CounterState> {
-  final GetCounterUseCase getCounterUserCase;
-  final IncrementCounterUseCase incrementCounterUseCase;
+  final getCounterUserCase = getIt<GetCounterUseCase>();
+  final incrementCounterUseCase = getIt<IncrementCounterUseCase>();
 
-  CounterBloc(this.getCounterUserCase, this.incrementCounterUseCase)
-      : super(InitialCounterState(CounterEntity(value: 0))) {
+  CounterBloc() : super(InitialCounterState(CounterEntity(value: 0))) {
     on<CounterEvent>((event, emit) async {
       if (event is IncrementCounter) {
-        final incrementNewState = await _mapIncrementCounterToState();
-        emit(incrementNewState);
+        incrementCounterUseCase();
+        final counter = getCounterUserCase();
+        emit(LoadedCounterState(counter));
       }
     });
-  }
-
-  Future<CounterState> _mapIncrementCounterToState() async {
-    try {
-      final counterEntity = await incrementCounterUseCase.execute();
-      return LoadedCounterState(counterEntity);
-    } catch (_) {
-      return ErrorCounterState(error: "Something went wrong!!!");
-    }
   }
 }
